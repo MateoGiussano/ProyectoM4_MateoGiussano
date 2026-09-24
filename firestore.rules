@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /tasks/{taskId} {
+      // Leer o borrar: solo si sos el dueño de la tarea que YA existe
+      allow read, delete: if request.auth != null
+                           && request.auth.uid == resource.data.userId;
+
+      // Crear: solo si el userId que estás guardando es el tuyo propio
+      allow create: if request.auth != null
+                     && request.auth.uid == request.resource.data.userId;
+
+      // Actualizar: sos dueño de la tarea actual, Y no estás intentando
+      // cambiarle el dueño a la tarea
+      allow update: if request.auth != null
+                     && request.auth.uid == resource.data.userId
+                     && request.auth.uid == request.resource.data.userId;
+    }
+  }
+}
