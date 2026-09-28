@@ -1,5 +1,22 @@
+/**
+ * Endpoint: POST /api/send-email
+ *
+ * Recibe { to, summary } y envía un email con AWS SES.
+ * Corre SOLO en el servidor (función de Vercel): las credenciales de AWS
+ * nunca llegan al navegador.
+ *
+ * Variables de entorno necesarias (ninguna lleva prefijo VITE_):
+ *   AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, SES_FROM_EMAIL
+ *
+ * Respuestas:
+ *   200 -> { ok: true, messageId }
+ *   400 -> falta "to" o "summary"
+ *   405 -> el método no es POST
+ *   500 -> error de configuración o fallo al enviar con SES
+ */
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+
 
 const ses = new SESClient({
   region: process.env.AWS_REGION,
@@ -15,7 +32,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const { to, summary } = req.body ?? {};
-
   if (!to || !summary) {
     return res.status(400).json({ error: "Missing required fields: to, summary" });
   }
