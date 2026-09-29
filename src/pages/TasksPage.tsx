@@ -24,7 +24,7 @@ function TasksPage() {
 
   return (
     <div>
-      <h1>Página de Tareas</h1>
+      <h1 className="text-3xl font-bold text-red-600">Página de Tareas</h1>
       <p>Sesión iniciada como: {currentUser?.email}</p>
       <button onClick={handleLogout}>Cerrar sesión</button>
 
