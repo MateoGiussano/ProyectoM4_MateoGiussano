@@ -1,5 +1,8 @@
 import { useState } from "react";
 import type { Task } from "../types/Task";
+import Button from "./Button";
+import TextInput from "./TextInput";
+import ErrorMessage from "./ErrorMessage";
 
 type TaskItemProps = {
   task: Task;
@@ -36,36 +39,56 @@ function TaskItem({ task, onToggle, onUpdate, onDelete }: TaskItemProps) {
   }
 
   return (
-    <li>
+    <li className="group py-3">
       {isEditing ? (
-        <>
-          <input
-            type="text"
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-          />
-          <input
-            type="text"
-            value={editDescription}
-            onChange={(e) => setEditDescription(e.target.value)}
-          />
-          <button onClick={handleSave}>Guardar</button>
-          <button onClick={handleCancel}>Cancelar</button>
-          {error && <p style={{ color: "red" }}>{error}</p>}
-        </>
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <TextInput
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              className="sm:flex-1"
+            />
+            <TextInput
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              className="sm:flex-1"
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={handleSave}>Guardar</Button>
+            <Button variant="secondary" onClick={handleCancel}>
+              Cancelar
+            </Button>
+          </div>
+          <ErrorMessage message={error} />
+        </div>
       ) : (
-        <>
+        <div className="flex items-center gap-3">
           <input
             type="checkbox"
             checked={task.completed}
             onChange={() => onToggle(task.id, !task.completed)}
+            className="h-4 w-4 shrink-0 accent-blue-700"
           />
-          <span style={{ textDecoration: task.completed ? "line-through" : "none" }}>
-            <strong>{task.title}</strong> — {task.description}
-          </span>
-          <button onClick={handleStartEdit}>Editar</button>
-          <button onClick={() => onDelete(task.id)}>Eliminar</button>
-        </>
+          <p className="min-w-0 flex-1 truncate text-sm">
+            <span
+              className={
+                task.completed ? "text-stone-400 line-through" : "font-medium text-stone-800"
+              }
+            >
+              {task.title}
+            </span>{" "}
+            <span className="text-stone-500">— {task.description}</span>
+          </p>
+          <div className="flex shrink-0 gap-2 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
+            <Button variant="secondary" onClick={handleStartEdit}>
+              Editar
+            </Button>
+            <Button variant="danger" onClick={() => onDelete(task.id)}>
+              Eliminar
+            </Button>
+          </div>
+        </div>
       )}
     </li>
   );

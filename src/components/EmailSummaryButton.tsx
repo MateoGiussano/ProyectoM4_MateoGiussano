@@ -1,5 +1,7 @@
 import { useState } from "react";
 import type { Task } from "../types/Task";
+import Button from "./Button";
+import ErrorMessage from "./ErrorMessage";
 
 type EmailSummaryButtonProps = {
   tasks: Task[];
@@ -10,13 +12,8 @@ function buildSummary(tasks: Task[]) {
   const pendientes = tasks.filter((t) => !t.completed);
   const completadas = tasks.filter((t) => t.completed);
 
-  const listaPendientes = pendientes
-    .map((t) => `- ${t.title}: ${t.description}`)
-    .join("\n");
-
-  const listaCompletadas = completadas
-    .map((t) => `- ${t.title}: ${t.description}`)
-    .join("\n");
+  const listaPendientes = pendientes.map((t) => `- ${t.title}: ${t.description}`).join("\n");
+  const listaCompletadas = completadas.map((t) => `- ${t.title}: ${t.description}`).join("\n");
 
   return (
     `Pendientes (${pendientes.length}):\n` +
@@ -57,12 +54,12 @@ function EmailSummaryButton({ tasks, userEmail }: EmailSummaryButtonProps) {
   }
 
   return (
-    <div>
-      <button onClick={handleSend} disabled={status === "loading"}>
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <Button variant="secondary" onClick={handleSend} disabled={status === "loading"}>
         {status === "loading" ? "Enviando..." : "Enviar resumen por email"}
-      </button>
-      {status === "success" && <span style={{ color: "green" }}> ¡Email enviado!</span>}
-      {status === "error" && <span style={{ color: "red" }}> {errorMsg}</span>}
+      </Button>
+      {status === "success" && <span className="text-sm text-green-700">¡Email enviado!</span>}
+      {status === "error" && <ErrorMessage message={errorMsg} />}
     </div>
   );
 }

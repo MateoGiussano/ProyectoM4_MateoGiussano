@@ -1,13 +1,13 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { FirebaseError } from "firebase/app";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { auth } from "../services/firebase";
+import { getAuthErrorMessage } from "../services/authErrors";
 import Button from "../components/Button";
 import TextInput from "../components/TextInput";
 import ErrorMessage from "../components/ErrorMessage";
-import { FirebaseError } from "firebase/app";
-import { getAuthErrorMessage } from "../services/authErrors";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -25,7 +25,7 @@ function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigate("/");
-      } catch (err) {
+    } catch (err) {
       const code = err instanceof FirebaseError ? err.code : "";
       setError(getAuthErrorMessage(code));
     } finally {
@@ -34,40 +34,46 @@ function LoginPage() {
   }
 
   return (
-    <main className="mx-auto mt-16 w-full max-w-sm px-4 sm:mt-24">
-      <h1 className="text-2xl font-semibold tracking-tight">Iniciar sesión</h1>
-      <p className="mt-1 text-sm text-stone-500">Entrá para ver tus tareas.</p>
+    <div className="min-h-screen bg-white">
+      <header className="px-4 py-4 sm:px-6">
+        <p className="text-xl font-bold tracking-tight text-blue-700">MateDo</p>
+      </header>
 
-      <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-3">
-        <TextInput
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <TextInput
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+      <main className="mx-auto mt-8 w-full max-w-sm px-4 sm:mt-16">
+        <h1 className="text-2xl font-semibold tracking-tight">Iniciar sesión</h1>
+        <p className="mt-1 text-sm text-stone-500">Entrá para ver tus tareas.</p>
 
-        <ErrorMessage message={error} />
+        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-3">
+          <TextInput
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <TextInput
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
-        <Button type="submit" disabled={loading}>
-          {loading ? "Ingresando..." : "Ingresar"}
-        </Button>
-      </form>
+          <ErrorMessage message={error} />
 
-      <p className="mt-4 text-sm text-stone-500">
-        ¿No tenés cuenta?{" "}
-        <Link to="/register" className="text-blue-700 hover:underline">
-          Registrate
-        </Link>
-      </p>
-    </main>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Ingresando..." : "Ingresar"}
+          </Button>
+        </form>
+
+        <p className="mt-4 text-sm text-stone-500">
+          ¿No tenés cuenta?{" "}
+          <Link to="/register" className="text-blue-700 hover:underline">
+            Registrate
+          </Link>
+        </p>
+      </main>
+    </div>
   );
 }
 
